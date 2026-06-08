@@ -11,8 +11,10 @@ function AddPageNodeButton() {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
     });
-    const jitter = () => (Math.random() - 0.5) * 80;
-    addPageNode({ x: center.x + jitter(), y: center.y + jitter() });
+    addPageNode({
+      x: center.x + (Math.random() - 0.5) * 320,
+      y: center.y + (Math.random() - 0.5) * 240,
+    });
   };
 
   return (
