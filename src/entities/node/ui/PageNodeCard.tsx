@@ -31,6 +31,7 @@ function InlineEditableText({ value, onCommit, className, placeholder }: InlineE
         autoFocus
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
+        onFocus={(event) => event.target.select()}
         onBlur={commit}
         onKeyDown={handleKeyDown}
         className={`nodrag w-full rounded border border-blue-400 px-1 outline-none ${className}`}
