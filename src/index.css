@@ -1,11 +1,4 @@
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
-}
+@import 'tailwindcss';
 
 #root {
   min-height: 100svh;
