@@ -1,7 +1,7 @@
-import { MindMapCanvas } from '@widgets/mind-map-canvas';
+import { WorkspaceLayout } from '@widgets/workspace-layout';
 
 function CanvasPage() {
-  return <MindMapCanvas />;
+  return <WorkspaceLayout />;
 }
 
 export default CanvasPage;

@@ -63,7 +63,7 @@ function MindMapCanvasInner() {
 
 function MindMapCanvas() {
   return (
-    <div className="h-screen w-screen">
+    <div className="h-full w-full">
       <ReactFlowProvider>
         <MindMapCanvasInner />
       </ReactFlowProvider>
