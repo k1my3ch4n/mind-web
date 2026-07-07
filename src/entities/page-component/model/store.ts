@@ -4,6 +4,9 @@ import { persist } from 'zustand/middleware';
 
 import type { PageComponentData, PageComponentType } from './types';
 
+// 매번 새 배열을 반환하면 useSyncExternalStore가 "getSnapshot should be cached" 무한 루프에 빠지므로 고정 참조로 공유한다.
+export const EMPTY_PAGE_COMPONENTS: PageComponentData[] = [];
+
 const DEFAULT_TEXT: Record<PageComponentType, string> = {
   button: '버튼',
   text: '텍스트',

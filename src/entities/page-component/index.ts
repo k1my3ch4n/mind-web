@@ -1,4 +1,4 @@
-export { usePageComponentStore } from './model/store';
+export { usePageComponentStore, EMPTY_PAGE_COMPONENTS } from './model/store';
 export type {
   PageComponentAlign,
   PageComponentData,
