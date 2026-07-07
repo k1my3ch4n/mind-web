@@ -34,7 +34,9 @@ function MindMapCanvasInner() {
 
   const handleSelectionChange = useCallback(
     ({ nodes: selectedNodes, edges: selectedEdges }: { nodes: PageNode[]; edges: RouteEdge[] }) => {
-      setSelection({ nodeId: selectedNodes[0]?.id, edgeId: selectedEdges[0]?.id });
+      const selectedEdge = selectedEdges[0];
+      // 엣지만 선택된 경우, 그 라우트가 향하는 target 노드를 선택된 것으로 취급한다.
+      setSelection({ nodeId: selectedNodes[0]?.id ?? selectedEdge?.target, edgeId: selectedEdge?.id });
     },
     [setSelection],
   );
