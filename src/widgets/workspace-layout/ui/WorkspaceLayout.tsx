@@ -12,6 +12,8 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 function WorkspaceLayout() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [ratio, setRatio] = useState(INITIAL_RATIO);
+  const [isEditorExpanded, setIsEditorExpanded] = useState(false);
+  const toggleEditorExpanded = useCallback(() => setIsEditorExpanded((prev) => !prev), []);
 
   const handleDividerMouseDown = useCallback((event: MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -40,17 +42,25 @@ function WorkspaceLayout() {
       </header>
 
       <div ref={containerRef} className="flex min-h-0 flex-1">
-        <div style={{ width: `${ratio * 100}%` }} className="h-full min-w-0">
+        <div
+          style={{ width: isEditorExpanded ? '0%' : `${ratio * 100}%` }}
+          className="h-full min-w-0 overflow-hidden"
+        >
           <MindMapCanvas />
         </div>
 
-        <div
-          onMouseDown={handleDividerMouseDown}
-          className="w-1 shrink-0 cursor-col-resize bg-gray-200 transition-colors hover:bg-blue-400"
-        />
+        {!isEditorExpanded && (
+          <div
+            onMouseDown={handleDividerMouseDown}
+            className="w-1 shrink-0 cursor-col-resize bg-gray-200 transition-colors hover:bg-blue-400"
+          />
+        )}
 
-        <div style={{ width: `${(1 - ratio) * 100}%` }} className="h-full min-w-0 border-l border-gray-100">
-          <LayoutEditorPanel />
+        <div
+          style={{ width: isEditorExpanded ? '100%' : `${(1 - ratio) * 100}%` }}
+          className={`h-full min-w-0 ${isEditorExpanded ? '' : 'border-l border-gray-100'}`}
+        >
+          <LayoutEditorPanel isExpanded={isEditorExpanded} onToggleExpand={toggleEditorExpanded} />
         </div>
       </div>
     </div>
