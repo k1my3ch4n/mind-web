@@ -2,6 +2,7 @@ import { useCallback, useRef, useState, type MouseEvent } from 'react';
 
 import { MindMapCanvas } from '@widgets/mind-map-canvas';
 import { LayoutEditorPanel } from '@widgets/layout-editor';
+import { ProjectIOControls } from '@features/project-io';
 
 const INITIAL_RATIO = 0.6;
 const MIN_RATIO = 0.3;
@@ -37,8 +38,9 @@ function WorkspaceLayout() {
 
   return (
     <div className="flex h-screen w-screen flex-col">
-      <header className="flex h-12 shrink-0 items-center border-b border-gray-200 bg-white px-4">
+      <header className="flex h-12 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4">
         <h1 className="text-sm font-semibold text-gray-900">mind-web</h1>
+        <ProjectIOControls />
       </header>
 
       <div ref={containerRef} className="flex min-h-0 flex-1">
