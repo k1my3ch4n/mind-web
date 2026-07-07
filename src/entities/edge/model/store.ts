@@ -9,6 +9,7 @@ interface EdgeStoreState {
   onEdgesChange: (changes: EdgeChange<RouteEdge>[]) => void;
   addRouteEdge: (connection: Connection, label?: string) => void;
   updateEdgeLabel: (id: string, label: string) => void;
+  loadEdges: (edges: RouteEdge[]) => void;
 }
 
 export const useEdgeStore = create<EdgeStoreState>()(
@@ -29,6 +30,7 @@ export const useEdgeStore = create<EdgeStoreState>()(
             edge.id === id ? { ...edge, data: { ...edge.data, label } } : edge,
           ),
         }),
+      loadEdges: (edges) => set({ edges }),
     }),
     {
       name: 'mind-web-edges',

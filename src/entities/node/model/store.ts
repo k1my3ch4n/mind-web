@@ -9,6 +9,7 @@ interface NodeStoreState {
   onNodesChange: (changes: NodeChange<PageNode>[]) => void;
   addPageNode: (position: XYPosition) => void;
   renameNode: (id: string, data: Partial<PageNodeData>) => void;
+  loadNodes: (nodes: PageNode[]) => void;
 }
 
 export const useNodeStore = create<NodeStoreState>()(
@@ -34,6 +35,7 @@ export const useNodeStore = create<NodeStoreState>()(
             node.id === id ? { ...node, data: { ...node.data, ...data } } : node,
           ),
         }),
+      loadNodes: (nodes) => set({ nodes }),
     }),
     {
       name: 'mind-web-nodes',

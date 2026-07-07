@@ -33,6 +33,7 @@ interface PageComponentStoreState {
   reorderComponents: (nodeId: string, activeId: string, overId: string) => void;
   updateComponent: (nodeId: string, componentId: string, patch: Partial<PageComponentData>) => void;
   removeComponent: (nodeId: string, componentId: string) => void;
+  loadComponents: (componentsByNodeId: Record<string, PageComponentData[]>) => void;
 }
 
 export const usePageComponentStore = create<PageComponentStoreState>()(
@@ -77,6 +78,7 @@ export const usePageComponentStore = create<PageComponentStoreState>()(
             ),
           },
         }),
+      loadComponents: (componentsByNodeId) => set({ componentsByNodeId }),
     }),
     {
       name: 'mind-web-page-components',
