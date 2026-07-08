@@ -7,8 +7,7 @@ import type { RouteEdge } from './types';
 interface EdgeStoreState {
   edges: RouteEdge[];
   onEdgesChange: (changes: EdgeChange<RouteEdge>[]) => void;
-  addRouteEdge: (connection: Connection, label?: string) => void;
-  updateEdgeLabel: (id: string, label: string) => void;
+  addRouteEdge: (connection: Connection) => void;
   loadEdges: (edges: RouteEdge[]) => void;
 }
 
@@ -17,17 +16,11 @@ export const useEdgeStore = create<EdgeStoreState>()(
     (set, get) => ({
       edges: [],
       onEdgesChange: (changes) => set({ edges: applyEdgeChanges(changes, get().edges) }),
-      addRouteEdge: (connection, label = '') =>
+      addRouteEdge: (connection) =>
         set({
           edges: addEdge<RouteEdge>(
-            { ...connection, id: crypto.randomUUID(), type: 'routeEdge', data: { label } },
+            { ...connection, id: crypto.randomUUID(), type: 'routeEdge' },
             get().edges,
-          ),
-        }),
-      updateEdgeLabel: (id, label) =>
-        set({
-          edges: get().edges.map((edge) =>
-            edge.id === id ? { ...edge, data: { ...edge.data, label } } : edge,
           ),
         }),
       loadEdges: (edges) => set({ edges }),

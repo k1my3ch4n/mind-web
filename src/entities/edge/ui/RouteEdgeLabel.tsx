@@ -1,23 +1,37 @@
 import { useState } from 'react';
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, type EdgeProps } from '@xyflow/react';
+import {
+  BaseEdge,
+  EdgeLabelRenderer,
+  getBezierPath,
+  useNodesData,
+  useReactFlow,
+  type EdgeProps,
+} from '@xyflow/react';
 
-import { useEdgeStore } from '../model/store';
+// 타입 전용 import — 라벨(=target 노드의 route)의 조회/수정은 React Flow 인스턴스를 통해서만 하므로
+// entities/node의 store에는 의존하지 않는다.
+import type { PageNode } from '@entities/node';
+
 import type { RouteEdge } from '../model/types';
 
 function RouteEdgeLabel({
   id,
+  target,
   sourceX,
   sourceY,
   sourcePosition,
   targetX,
   targetY,
   targetPosition,
-  data,
   selected,
 }: EdgeProps<RouteEdge>) {
-  const updateEdgeLabel = useEdgeStore((state) => state.updateEdgeLabel);
+  const { updateNodeData } = useReactFlow<PageNode>();
+  // 라벨은 target 노드의 route에서 파생된다 (단일 소스) — 노드의 route를 바꾸면 라벨도 즉시 따라간다.
+  const targetNode = useNodesData<PageNode>(target);
+  const route = targetNode?.data.route ?? '';
+
   const [isEditing, setIsEditing] = useState(false);
-  const [draftLabel, setDraftLabel] = useState(data?.label ?? '');
+  const [draftRoute, setDraftRoute] = useState('');
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -29,12 +43,12 @@ function RouteEdgeLabel({
   });
 
   const startEditing = () => {
-    setDraftLabel(data?.label ?? '');
+    setDraftRoute(route);
     setIsEditing(true);
   };
 
   const commitEditing = () => {
-    updateEdgeLabel(id, draftLabel.trim());
+    updateNodeData(target, { route: draftRoute.trim() || '/' });
     setIsEditing(false);
   };
 
@@ -49,8 +63,8 @@ function RouteEdgeLabel({
           {isEditing ? (
             <input
               autoFocus
-              value={draftLabel}
-              onChange={(event) => setDraftLabel(event.target.value)}
+              value={draftRoute}
+              onChange={(event) => setDraftRoute(event.target.value)}
               onBlur={commitEditing}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') commitEditing();
@@ -64,7 +78,7 @@ function RouteEdgeLabel({
               onClick={startEditing}
               className="rounded border border-gray-200 bg-white px-1.5 py-0.5 text-xs text-gray-500 shadow-sm hover:border-blue-300 hover:text-blue-600"
             >
-              {data?.label || '라우트 입력'}
+              {route || '라우트 입력'}
             </button>
           )}
         </div>
