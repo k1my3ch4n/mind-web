@@ -13,7 +13,7 @@ import {
   EMPTY_PAGE_COMPONENTS,
   type PageComponentType,
 } from '@entities/page-component';
-import type { PageNode } from '@entities/node';
+import type { PageNodeSummary } from '@entities/node';
 
 import ComponentPalette from './ComponentPalette';
 import Artboard, { ARTBOARD_DROP_ZONE_ID } from './Artboard';
@@ -25,7 +25,7 @@ interface DragData {
 }
 
 interface PageComponentEditorProps {
-  node: PageNode;
+  node: PageNodeSummary;
 }
 
 function PageComponentEditor({ node }: PageComponentEditorProps) {

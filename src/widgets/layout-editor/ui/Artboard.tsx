@@ -3,12 +3,12 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import { CSS } from '@dnd-kit/utilities';
 
 import { PageComponentPreview, type PageComponentData } from '@entities/page-component';
-import type { PageNode } from '@entities/node';
+import type { PageNodeSummary } from '@entities/node';
 
 export const ARTBOARD_DROP_ZONE_ID = 'artboard-drop-zone';
 
 interface ArtboardProps {
-  node: PageNode;
+  node: PageNodeSummary;
   components: PageComponentData[];
   selectedComponentId: string | null;
   onSelectComponent: (componentId: string | null) => void;

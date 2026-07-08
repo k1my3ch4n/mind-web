@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useNodeStore } from '@entities/node';
+import { usePageNodeSummary } from '@entities/node';
 import { usePageComponentStore, EMPTY_PAGE_COMPONENTS, PageComponentPreview } from '@entities/page-component';
 
 import PageComponentEditor from './PageComponentEditor';
@@ -20,7 +20,7 @@ function LivePreviewView({ canvasSelectedNodeId }: LivePreviewViewProps) {
     setPreviewNodeId(canvasSelectedNodeId);
   }
 
-  const previewNode = useNodeStore((state) => state.nodes.find((node) => node.id === previewNodeId));
+  const previewNode = usePageNodeSummary(previewNodeId);
   const components = usePageComponentStore((state) =>
     previewNode ? (state.componentsByNodeId[previewNode.id] ?? EMPTY_PAGE_COMPONENTS) : EMPTY_PAGE_COMPONENTS,
   );

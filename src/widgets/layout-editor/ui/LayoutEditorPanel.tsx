@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useNodeStore } from '@entities/node';
+import { usePageNodeSummary } from '@entities/node';
 import { useCanvasSelectionStore } from '@shared/model/selectionStore';
 
 import PageComponentEditor from './PageComponentEditor';
@@ -32,9 +32,7 @@ function LayoutEditorPanel({ isExpanded, onToggleExpand }: LayoutEditorPanelProp
   const [activeTab, setActiveTab] = useState<EditorTab>('design');
 
   const selectedNodeId = useCanvasSelectionStore((state) => state.selectedNodeId);
-  const selectedNode = useNodeStore((state) =>
-    state.nodes.find((node) => node.id === selectedNodeId),
-  );
+  const selectedNode = usePageNodeSummary(selectedNodeId);
 
   if (!selectedNode) {
     return <EmptyEditorState />;
