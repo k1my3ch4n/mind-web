@@ -6,13 +6,17 @@ import {
   ReactFlow,
   ReactFlowProvider,
   type Connection,
+  type NodeChange,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { nodeTypes, useNodeStore, type PageNode } from '@entities/node';
+import { useNodeStore, type PageNode } from '@entities/node';
 import { edgeTypes, useEdgeStore, type RouteEdge } from '@entities/edge';
+import { usePageComponentStore } from '@entities/page-component';
 import { AddPageNodeButton } from '@features/add-page-node';
 import { useCanvasSelectionStore } from '@shared/model/selectionStore';
+
+import { nodeTypes } from './nodeTypes';
 
 function MindMapCanvasInner() {
   const nodes = useNodeStore((state) => state.nodes);
@@ -22,23 +26,34 @@ function MindMapCanvasInner() {
   const onEdgesChange = useEdgeStore((state) => state.onEdgesChange);
   const addRouteEdge = useEdgeStore((state) => state.addRouteEdge);
 
-  const setSelection = useCanvasSelectionStore((state) => state.setSelection);
+  const removeNodeReferences = usePageComponentStore((state) => state.removeNodeReferences);
+
+  const setSelectedNodeId = useCanvasSelectionStore((state) => state.setSelectedNodeId);
+
+  const handleNodesChange = useCallback(
+    (changes: NodeChange<PageNode>[]) => {
+      onNodesChange(changes);
+
+      // 엣지는 React Flow가 cascading으로 지워주지만, 컴포넌트 쪽 참조는 여기서 함께 정리해야 한다.
+      const removedNodeIds = changes
+        .filter((change) => change.type === 'remove')
+        .map((change) => change.id);
+      if (removedNodeIds.length > 0) removeNodeReferences(removedNodeIds);
+    },
+    [onNodesChange, removeNodeReferences],
+  );
 
   const handleConnect = useCallback(
-    (connection: Connection) => {
-      const targetNode = useNodeStore.getState().nodes.find((node) => node.id === connection.target);
-      addRouteEdge(connection, targetNode?.data.route);
-    },
+    (connection: Connection) => addRouteEdge(connection),
     [addRouteEdge],
   );
 
   const handleSelectionChange = useCallback(
     ({ nodes: selectedNodes, edges: selectedEdges }: { nodes: PageNode[]; edges: RouteEdge[] }) => {
-      const selectedEdge = selectedEdges[0];
       // 엣지만 선택된 경우, 그 라우트가 향하는 target 노드를 선택된 것으로 취급한다.
-      setSelection({ nodeId: selectedNodes[0]?.id ?? selectedEdge?.target, edgeId: selectedEdge?.id });
+      setSelectedNodeId(selectedNodes[0]?.id ?? selectedEdges[0]?.target ?? null);
     },
-    [setSelection],
+    [setSelectedNodeId],
   );
 
   return (
@@ -47,7 +62,7 @@ function MindMapCanvasInner() {
       edges={edges}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
-      onNodesChange={onNodesChange}
+      onNodesChange={handleNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={handleConnect}
       onSelectionChange={handleSelectionChange}
