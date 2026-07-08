@@ -1,4 +1,5 @@
-import { useNodeStore } from '@entities/node';
+import { useEdgeStore } from '@entities/edge';
+import { usePageNodeSummaries } from '@entities/node';
 import {
   usePageComponentStore,
   type PageComponentAlign,
@@ -52,7 +53,7 @@ function ToggleGroup<T extends string>({ value, options, onChange }: ToggleGroup
 
 function PropertyPanel({ nodeId, component }: PropertyPanelProps) {
   const updateComponent = usePageComponentStore((state) => state.updateComponent);
-  const nodes = useNodeStore((state) => state.nodes);
+  const nodes = usePageNodeSummaries();
 
   if (!component) {
     return (
@@ -64,6 +65,18 @@ function PropertyPanel({ nodeId, component }: PropertyPanelProps) {
   }
 
   const update = (patch: Partial<PageComponentData>) => updateComponent(nodeId, component.id, patch);
+
+  // "클릭 시 이동"은 곧 라우트이므로, 캔버스에 해당 엣지가 없으면 자동 생성해 구조와 프리뷰 동작을 일치시킨다.
+  const updateOnClickNodeId = (targetNodeId: string | null) => {
+    update({ onClickNodeId: targetNodeId });
+    if (!targetNodeId || targetNodeId === nodeId) return;
+
+    const { edges, addRouteEdge } = useEdgeStore.getState();
+    const hasEdge = edges.some((edge) => edge.source === nodeId && edge.target === targetNodeId);
+    if (!hasEdge) {
+      addRouteEdge({ source: nodeId, target: targetNodeId, sourceHandle: null, targetHandle: null });
+    }
+  };
 
   return (
     <div className="flex w-52 shrink-0 flex-col gap-4 overflow-auto border-l border-gray-100 p-3">
@@ -93,7 +106,7 @@ function PropertyPanel({ nodeId, component }: PropertyPanelProps) {
         <span className="text-xs font-medium text-gray-500">클릭 시 이동</span>
         <select
           value={component.onClickNodeId ?? ''}
-          onChange={(event) => update({ onClickNodeId: event.target.value || null })}
+          onChange={(event) => updateOnClickNodeId(event.target.value || null)}
           className="rounded-md border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 outline-none focus:border-blue-400"
         >
           <option value="">없음</option>
