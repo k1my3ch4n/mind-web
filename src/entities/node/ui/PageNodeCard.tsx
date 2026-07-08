@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from 'react';
+import { useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 
 import { useNodeStore } from '../model/store';
@@ -52,7 +52,12 @@ function InlineEditableText({ value, onCommit, className, placeholder }: InlineE
   );
 }
 
-function PageNodeCard({ id, data, selected }: NodeProps<PageNode>) {
+interface PageNodeCardProps extends NodeProps<PageNode> {
+  // 페이지 레이아웃 미니 미리보기 slot — 컴포넌트 데이터와의 결합은 widget 레이어에서 주입한다.
+  miniPreview?: ReactNode;
+}
+
+function PageNodeCard({ id, data, selected, miniPreview }: PageNodeCardProps) {
   const renameNode = useNodeStore((state) => state.renameNode);
 
   return (
@@ -79,9 +84,15 @@ function PageNodeCard({ id, data, selected }: NodeProps<PageNode>) {
         />
       </div>
 
-      <div className="m-3 flex h-20 items-center justify-center rounded border border-dashed border-gray-200 text-xs text-gray-300">
-        레이아웃 미리보기
-      </div>
+      {miniPreview ? (
+        <div className="m-3 h-20 overflow-hidden rounded border border-gray-100 bg-gray-50/60 p-2">
+          {miniPreview}
+        </div>
+      ) : (
+        <div className="m-3 flex h-20 items-center justify-center rounded border border-dashed border-gray-200 text-xs text-gray-300">
+          레이아웃 미리보기
+        </div>
+      )}
     </div>
   );
 }
