@@ -68,6 +68,7 @@ function MindMapCanvasInner() {
       onConnect={handleConnect}
       onSelectionChange={handleSelectionChange}
       deleteKeyCode={['Backspace', 'Delete']}
+      zoomOnDoubleClick={false}
       fitView
     >
       <Background />
