@@ -14,6 +14,7 @@ import { useNodeStore, type PageNode } from '@entities/node';
 import { edgeTypes, useEdgeStore, type RouteEdge } from '@entities/edge';
 import { usePageComponentStore } from '@entities/page-component';
 import { AddPageNodeButton } from '@features/add-page-node';
+import { StructureInsightPanel } from '@features/structure-insight';
 import { useCanvasSelectionStore } from '@shared/model/selectionStore';
 
 import { nodeTypes } from './nodeTypes';
@@ -73,6 +74,9 @@ function MindMapCanvasInner() {
       <Controls />
       <Panel position="top-left">
         <AddPageNodeButton />
+      </Panel>
+      <Panel position="top-right">
+        <StructureInsightPanel />
       </Panel>
     </ReactFlow>
   );
