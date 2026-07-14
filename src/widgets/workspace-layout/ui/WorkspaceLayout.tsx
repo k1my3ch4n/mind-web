@@ -1,8 +1,10 @@
 import { useCallback, useRef, useState, type MouseEvent } from 'react';
+import { Link } from 'react-router-dom';
 
 import { MindMapCanvas } from '@widgets/mind-map-canvas';
 import { LayoutEditorPanel } from '@widgets/layout-editor';
 import { ProjectIOControls } from '@features/project-io';
+import { AppFooter, Logo } from '@shared/ui';
 
 const INITIAL_RATIO = 0.6;
 const MIN_RATIO = 0.3;
@@ -39,7 +41,14 @@ function WorkspaceLayout() {
   return (
     <div className="flex h-screen w-screen flex-col">
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4">
-        <h1 className="text-sm font-semibold text-gray-900">mind-web</h1>
+        <Link
+          to="/"
+          title="메인으로 (작업 내용은 자동 저장됩니다)"
+          className="flex items-center gap-2 hover:opacity-80"
+        >
+          <Logo size={20} />
+          <h1 className="text-sm font-semibold text-gray-900">mind-web</h1>
+        </Link>
         <ProjectIOControls />
       </header>
 
@@ -65,6 +74,8 @@ function WorkspaceLayout() {
           <LayoutEditorPanel isExpanded={isEditorExpanded} onToggleExpand={toggleEditorExpanded} />
         </div>
       </div>
+
+      <AppFooter variant="compact" />
     </div>
   );
 }
