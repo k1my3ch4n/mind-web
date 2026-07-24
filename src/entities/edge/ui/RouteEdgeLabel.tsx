@@ -54,7 +54,7 @@ function RouteEdgeLabel({
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} className={selected ? '!stroke-blue-500' : undefined} />
+      <BaseEdge id={id} path={edgePath} className={selected ? '!stroke-brand-500' : undefined} />
       <EdgeLabelRenderer>
         <div
           className="nodrag nopan pointer-events-auto absolute"
@@ -70,13 +70,13 @@ function RouteEdgeLabel({
                 if (event.key === 'Enter') commitEditing();
                 if (event.key === 'Escape') setIsEditing(false);
               }}
-              className="w-24 rounded border border-blue-400 bg-white px-1.5 py-0.5 text-xs text-gray-700 outline-none"
+              className="w-24 rounded border border-brand-400 bg-white px-1.5 py-0.5 text-xs text-gray-700 outline-none"
             />
           ) : (
             <button
               type="button"
               onClick={startEditing}
-              className="rounded border border-gray-200 bg-white px-1.5 py-0.5 text-xs text-gray-500 shadow-sm hover:border-blue-300 hover:text-blue-600"
+              className="rounded border border-gray-200 bg-white px-1.5 py-0.5 text-xs text-gray-500 shadow-sm hover:border-brand-300 hover:text-brand-600"
             >
               {route || '라우트 입력'}
             </button>
