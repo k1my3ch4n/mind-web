@@ -1,6 +1,12 @@
 import { useRef, type ChangeEvent } from 'react';
+import { FolderOpen, Save } from 'lucide-react';
 
-import { applyProjectFile, buildProjectFile, downloadProjectFile, parseProjectFile } from '../model/projectFile';
+import {
+  applyProjectFile,
+  buildProjectFile,
+  downloadProjectFile,
+  parseProjectFile,
+} from '../model/projectFile';
 
 function ProjectIOControls() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -42,17 +48,21 @@ function ProjectIOControls() {
     <div className="flex items-center gap-2">
       <button
         type="button"
+        title="프로젝트 JSON 파일 저장"
         onClick={handleExport}
-        className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        className="flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
       >
-        내보내기
+        <Save size={14} aria-hidden />
+        프로젝트 저장
       </button>
       <button
         type="button"
+        title="프로젝트 JSON 파일 열기"
         onClick={handleImportClick}
-        className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        className="flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
       >
-        불러오기
+        <FolderOpen size={14} aria-hidden />
+        프로젝트 열기
       </button>
       <input
         ref={fileInputRef}
