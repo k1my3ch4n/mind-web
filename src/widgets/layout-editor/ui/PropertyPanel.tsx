@@ -1,5 +1,6 @@
 import { useEdgeStore } from '@entities/edge';
 import { usePageNodeSummaries } from '@entities/node';
+import { X } from 'lucide-react';
 import {
   usePageComponentStore,
   type PageComponentAlign,
@@ -9,7 +10,8 @@ import {
 
 interface PropertyPanelProps {
   nodeId: string;
-  component: PageComponentData | null;
+  component: PageComponentData;
+  onClose: () => void;
 }
 
 interface ToggleGroupProps<T extends string> {
@@ -40,7 +42,7 @@ function ToggleGroup<T extends string>({ value, options, onChange }: ToggleGroup
           onClick={() => onChange(option.value)}
           className={`flex-1 rounded px-2 py-1 text-xs font-medium transition-colors ${
             value === option.value
-              ? 'bg-white text-gray-900 shadow-sm'
+              ? 'bg-white text-brand-700 shadow-sm'
               : 'text-gray-400 hover:text-gray-600'
           }`}
         >
@@ -51,20 +53,12 @@ function ToggleGroup<T extends string>({ value, options, onChange }: ToggleGroup
   );
 }
 
-function PropertyPanel({ nodeId, component }: PropertyPanelProps) {
+function PropertyPanel({ nodeId, component, onClose }: PropertyPanelProps) {
   const updateComponent = usePageComponentStore((state) => state.updateComponent);
   const nodes = usePageNodeSummaries();
 
-  if (!component) {
-    return (
-      <div className="flex w-52 shrink-0 flex-col border-l border-gray-100 p-3">
-        <h3 className="mb-2 text-xs font-medium text-gray-400">속성</h3>
-        <p className="text-xs text-gray-300">아트보드에서 컴포넌트를 선택하면 속성을 편집할 수 있어요.</p>
-      </div>
-    );
-  }
-
-  const update = (patch: Partial<PageComponentData>) => updateComponent(nodeId, component.id, patch);
+  const update = (patch: Partial<PageComponentData>) =>
+    updateComponent(nodeId, component.id, patch);
 
   // "클릭 시 이동"은 곧 라우트이므로, 캔버스에 해당 엣지가 없으면 자동 생성해 구조와 프리뷰 동작을 일치시킨다.
   const updateOnClickNodeId = (targetNodeId: string | null) => {
@@ -74,51 +68,80 @@ function PropertyPanel({ nodeId, component }: PropertyPanelProps) {
     const { edges, addRouteEdge } = useEdgeStore.getState();
     const hasEdge = edges.some((edge) => edge.source === nodeId && edge.target === targetNodeId);
     if (!hasEdge) {
-      addRouteEdge({ source: nodeId, target: targetNodeId, sourceHandle: null, targetHandle: null });
+      addRouteEdge({
+        source: nodeId,
+        target: targetNodeId,
+        sourceHandle: null,
+        targetHandle: null,
+      });
     }
   };
 
   return (
-    <div className="flex w-52 shrink-0 flex-col gap-4 overflow-auto border-l border-gray-100 p-3">
-      <h3 className="text-xs font-medium text-gray-400">속성</h3>
-
-      <label className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium text-gray-500">텍스트</span>
-        <textarea
-          rows={2}
-          value={component.text}
-          onChange={(event) => update({ text: event.target.value })}
-          className="resize-none rounded-md border border-gray-200 px-2 py-1.5 text-xs text-gray-700 outline-none focus:border-blue-400"
-        />
-      </label>
-
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium text-gray-500">정렬</span>
-        <ToggleGroup value={component.align} options={ALIGN_OPTIONS} onChange={(align) => update({ align })} />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium text-gray-500">크기</span>
-        <ToggleGroup value={component.size} options={SIZE_OPTIONS} onChange={(size) => update({ size })} />
-      </div>
-
-      <label className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium text-gray-500">클릭 시 이동</span>
-        <select
-          value={component.onClickNodeId ?? ''}
-          onChange={(event) => updateOnClickNodeId(event.target.value || null)}
-          className="rounded-md border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 outline-none focus:border-blue-400"
+    <aside className="absolute inset-y-0 right-0 z-20 flex w-60 flex-col overflow-auto border-l border-gray-200 bg-white p-4 shadow-xl shadow-gray-200/70">
+      <div className="mb-5 flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900">속성 편집</h3>
+          <p className="mt-0.5 text-[11px] uppercase tracking-wide text-gray-400">
+            {component.type}
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label="속성 패널 닫기"
+          onClick={onClose}
+          className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-700"
         >
-          <option value="">없음</option>
-          {nodes.map((node) => (
-            <option key={node.id} value={node.id}>
-              {node.data.name} ({node.data.route})
-              {node.id === nodeId ? ' · 현재 페이지' : ''}
-            </option>
-          ))}
-        </select>
-      </label>
-    </div>
+          <X size={14} aria-hidden />
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-gray-500">텍스트</span>
+          <textarea
+            rows={2}
+            value={component.text}
+            onChange={(event) => update({ text: event.target.value })}
+            className="resize-none rounded-md border border-gray-200 px-2 py-1.5 text-xs text-gray-700 outline-none focus:border-brand-400"
+          />
+        </label>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-gray-500">정렬</span>
+          <ToggleGroup
+            value={component.align}
+            options={ALIGN_OPTIONS}
+            onChange={(align) => update({ align })}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-gray-500">크기</span>
+          <ToggleGroup
+            value={component.size}
+            options={SIZE_OPTIONS}
+            onChange={(size) => update({ size })}
+          />
+        </div>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-gray-500">클릭 시 이동</span>
+          <select
+            value={component.onClickNodeId ?? ''}
+            onChange={(event) => updateOnClickNodeId(event.target.value || null)}
+            className="rounded-md border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 outline-none focus:border-brand-400"
+          >
+            <option value="">없음</option>
+            {nodes.map((node) => (
+              <option key={node.id} value={node.id}>
+                {node.data.name} ({node.data.route}){node.id === nodeId ? ' · 현재 페이지' : ''}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+    </aside>
   );
 }
 

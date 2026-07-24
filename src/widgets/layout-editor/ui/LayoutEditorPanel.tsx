@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Maximize2, PanelLeft } from 'lucide-react';
 
 import { usePageNodeSummary } from '@entities/node';
 import { useCanvasSelectionStore } from '@shared/model/selectionStore';
@@ -15,7 +16,7 @@ const TABS: { key: EditorTab; label: string }[] = [
 
 function EmptyEditorState() {
   return (
-    <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-gray-300">
+    <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm leading-6 text-gray-500">
       캔버스에서 페이지를 선택하면
       <br />
       이곳에서 레이아웃을 편집할 수 있어요.
@@ -64,10 +65,12 @@ function LayoutEditorPanel({ isExpanded, onToggleExpand }: LayoutEditorPanelProp
           </div>
           <button
             type="button"
+            title={isExpanded ? '캔버스와 편집기를 함께 보기' : '편집기를 넓게 보기'}
             onClick={onToggleExpand}
-            className="rounded px-2 py-1 text-xs font-medium text-gray-400 transition-colors hover:text-gray-600"
+            className="flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700"
           >
-            {isExpanded ? '← 캔버스' : '⛶ 전체화면'}
+            {isExpanded ? <PanelLeft size={13} aria-hidden /> : <Maximize2 size={13} aria-hidden />}
+            {isExpanded ? '캔버스로 돌아가기' : '편집기 확대'}
           </button>
         </div>
       </div>

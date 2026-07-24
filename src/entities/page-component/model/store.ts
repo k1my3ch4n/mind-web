@@ -29,7 +29,7 @@ function createComponent(type: PageComponentType): PageComponentData {
 
 interface PageComponentStoreState {
   componentsByNodeId: Record<string, PageComponentData[]>;
-  addComponent: (nodeId: string, type: PageComponentType) => void;
+  addComponent: (nodeId: string, type: PageComponentType) => string;
   reorderComponents: (nodeId: string, activeId: string, overId: string) => void;
   updateComponent: (nodeId: string, componentId: string, patch: Partial<PageComponentData>) => void;
   removeComponent: (nodeId: string, componentId: string) => void;
@@ -41,13 +41,16 @@ export const usePageComponentStore = create<PageComponentStoreState>()(
   persist(
     (set, get) => ({
       componentsByNodeId: {},
-      addComponent: (nodeId, type) =>
+      addComponent: (nodeId, type) => {
+        const component = createComponent(type);
         set({
           componentsByNodeId: {
             ...get().componentsByNodeId,
-            [nodeId]: [...(get().componentsByNodeId[nodeId] ?? []), createComponent(type)],
+            [nodeId]: [...(get().componentsByNodeId[nodeId] ?? []), component],
           },
-        }),
+        });
+        return component.id;
+      },
       reorderComponents: (nodeId, activeId, overId) => {
         const components = get().componentsByNodeId[nodeId] ?? [];
         const activeIndex = components.findIndex((component) => component.id === activeId);

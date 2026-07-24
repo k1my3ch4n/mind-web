@@ -11,7 +11,7 @@ const ALIGN_CLASS: Record<PageComponentAlign, string> = {
 
 // 실제 컴포넌트 렌더링 대신 타입별 단순 도형으로 축약해, 노드가 많아져도 가볍고 미니맵처럼 읽히게 한다.
 const SHAPE_CLASS: Record<PageComponentType, string> = {
-  button: 'h-2 w-10 rounded-sm bg-blue-400',
+  button: 'h-2 w-10 rounded-sm bg-brand-400',
   text: 'h-1.5 w-3/4 rounded-full bg-gray-200',
   image: 'h-5 w-full rounded-sm border border-dashed border-gray-300 bg-gray-100',
   input: 'h-2.5 w-full rounded-sm border border-gray-300 bg-white',

@@ -43,7 +43,7 @@ function PageComponentPreview({ component }: PageComponentPreviewProps) {
         <div className={`flex w-full ${ALIGN_WRAPPER_CLASS[align]}`}>
           <button
             type="button"
-            className={`rounded-md bg-blue-600 font-medium text-white shadow-sm ${TEXT_SIZE_CLASS[size]} ${CONTROL_PADDING_CLASS[size]}`}
+            className={`rounded-md bg-brand-600 font-medium text-white shadow-sm ${TEXT_SIZE_CLASS[size]} ${CONTROL_PADDING_CLASS[size]}`}
           >
             {text}
           </button>
@@ -52,7 +52,9 @@ function PageComponentPreview({ component }: PageComponentPreviewProps) {
 
     case 'text':
       return (
-        <p className={`w-full text-gray-700 ${ALIGN_TEXT_CLASS[align]} ${TEXT_SIZE_CLASS[size]}`}>{text}</p>
+        <p className={`w-full text-gray-700 ${ALIGN_TEXT_CLASS[align]} ${TEXT_SIZE_CLASS[size]}`}>
+          {text}
+        </p>
       );
 
     case 'image':

@@ -1,7 +1,12 @@
 import { useState } from 'react';
+import { ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 
 import { useNodeStore, usePageNodeSummary } from '@entities/node';
-import { usePageComponentStore, EMPTY_PAGE_COMPONENTS, PageComponentPreview } from '@entities/page-component';
+import {
+  usePageComponentStore,
+  EMPTY_PAGE_COMPONENTS,
+  PageComponentPreview,
+} from '@entities/page-component';
 
 import PageComponentEditor from './PageComponentEditor';
 import PreviewModalOverlay from './PreviewModalOverlay';
@@ -30,7 +35,9 @@ function LivePreviewView({ canvasSelectedNodeId }: LivePreviewViewProps) {
 
   const previewNode = usePageNodeSummary(previewNodeId);
   const components = usePageComponentStore((state) =>
-    previewNode ? (state.componentsByNodeId[previewNode.id] ?? EMPTY_PAGE_COMPONENTS) : EMPTY_PAGE_COMPONENTS,
+    previewNode
+      ? (state.componentsByNodeId[previewNode.id] ?? EMPTY_PAGE_COMPONENTS)
+      : EMPTY_PAGE_COMPONENTS,
   );
 
   // 열린 모달은 state가 아니라 컴포넌트 목록에서 파생 — 드로어에서 삭제되면 유령 모달 없이 자동 소멸
@@ -40,7 +47,7 @@ function LivePreviewView({ canvasSelectedNodeId }: LivePreviewViewProps) {
 
   if (!previewNode) {
     return (
-      <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-gray-300">
+      <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-gray-500">
         이 페이지가 삭제되었어요.
       </div>
     );
@@ -78,7 +85,7 @@ function LivePreviewView({ canvasSelectedNodeId }: LivePreviewViewProps) {
           disabled={history.length === 0}
           className="rounded-full px-1.5 py-0.5 text-sm text-gray-500 transition-colors hover:bg-gray-200 disabled:text-gray-300 disabled:hover:bg-transparent"
         >
-          ←
+          <ArrowLeft size={14} aria-hidden />
         </button>
         <div className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-500 shadow-sm">
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-gray-300" />
@@ -90,7 +97,7 @@ function LivePreviewView({ canvasSelectedNodeId }: LivePreviewViewProps) {
         <div className="flex flex-1 flex-col gap-2 overflow-auto bg-gray-50 p-6">
           <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-2 rounded-lg border border-gray-200 bg-white p-4">
             {components.length === 0 ? (
-              <p className="m-auto max-w-[16rem] text-center text-xs text-gray-300">
+              <p className="m-auto max-w-[16rem] text-center text-xs text-gray-500">
                 아직 배치된 컴포넌트가 없어요.
               </p>
             ) : (
@@ -107,7 +114,7 @@ function LivePreviewView({ canvasSelectedNodeId }: LivePreviewViewProps) {
                     key={component.id}
                     onClick={handleClick}
                     className={`rounded-md p-1 transition-colors ${
-                      handleClick ? 'cursor-pointer hover:ring-2 hover:ring-blue-100' : ''
+                      handleClick ? 'cursor-pointer hover:ring-2 hover:ring-brand-100' : ''
                     }`}
                   >
                     <PageComponentPreview component={component} />
@@ -135,9 +142,14 @@ function LivePreviewView({ canvasSelectedNodeId }: LivePreviewViewProps) {
         <button
           type="button"
           onClick={() => setIsDrawerOpen((prev) => !prev)}
-          className="w-full px-4 py-2 text-center text-xs font-medium text-gray-400 transition-colors hover:text-gray-600"
+          className="flex w-full items-center justify-center gap-1 px-4 py-2 text-center text-xs font-medium text-gray-500 transition-colors hover:text-gray-700"
         >
-          {isDrawerOpen ? '레이아웃 편집 닫기 ▾' : '레이아웃 편집 열기 ▴'}
+          {isDrawerOpen ? '레이아웃 편집 닫기' : '레이아웃 편집 열기'}
+          {isDrawerOpen ? (
+            <ChevronDown size={13} aria-hidden />
+          ) : (
+            <ChevronUp size={13} aria-hidden />
+          )}
         </button>
         {isDrawerOpen && (
           <div className="h-72 border-t border-gray-100">

@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import {
   DndContext,
+  KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 
 import {
   usePageComponentStore,
@@ -38,7 +40,15 @@ function PageComponentEditor({ node }: PageComponentEditorProps) {
   const reorderComponents = usePageComponentStore((state) => state.reorderComponents);
   const removeComponent = usePageComponentStore((state) => state.removeComponent);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleAddComponent = (type: PageComponentType) => {
+    const componentId = addComponent(node.id, type);
+    setSelectedComponentId(componentId);
+  };
 
   // 다른 페이지로 바뀌면 이전 페이지에서 선택했던 컴포넌트 상태를 초기화한다 (렌더링 중 조정 — useEffect 대신 권장 패턴).
   const [trackedNodeId, setTrackedNodeId] = useState(node.id);
@@ -54,21 +64,26 @@ function PageComponentEditor({ node }: PageComponentEditorProps) {
     if (!dragData) return;
 
     if (dragData.source === 'palette' && dragData.componentType) {
-      addComponent(node.id, dragData.componentType);
+      handleAddComponent(dragData.componentType);
       return;
     }
 
-    if (dragData.source === 'artboard' && over.id !== ARTBOARD_DROP_ZONE_ID && active.id !== over.id) {
+    if (
+      dragData.source === 'artboard' &&
+      over.id !== ARTBOARD_DROP_ZONE_ID &&
+      active.id !== over.id
+    ) {
       reorderComponents(node.id, String(active.id), String(over.id));
     }
   };
 
-  const selectedComponent = components.find((component) => component.id === selectedComponentId) ?? null;
+  const selectedComponent =
+    components.find((component) => component.id === selectedComponentId) ?? null;
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <div className="flex flex-1 overflow-auto">
-        <ComponentPalette />
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+        <ComponentPalette onAddComponent={handleAddComponent} />
         <Artboard
           node={node}
           components={components}
@@ -79,7 +94,13 @@ function PageComponentEditor({ node }: PageComponentEditorProps) {
             if (selectedComponentId === componentId) setSelectedComponentId(null);
           }}
         />
-        <PropertyPanel nodeId={node.id} component={selectedComponent} />
+        {selectedComponent && (
+          <PropertyPanel
+            nodeId={node.id}
+            component={selectedComponent}
+            onClose={() => setSelectedComponentId(null)}
+          />
+        )}
       </div>
     </DndContext>
   );
