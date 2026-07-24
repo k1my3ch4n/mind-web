@@ -1,10 +1,13 @@
-import { useCallback, useRef, useState, type MouseEvent } from 'react';
+import { useCallback, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 import { MindMapCanvas } from '@widgets/mind-map-canvas';
 import { LayoutEditorPanel } from '@widgets/layout-editor';
 import { ProjectIOControls } from '@features/project-io';
-import { AppFooter, Logo } from '@shared/ui';
+import { ProjectHistoryControls } from '@features/project-history';
+import { Logo } from '@shared/ui';
+
+import WorkspaceStatusBar from './WorkspaceStatusBar';
 
 const INITIAL_RATIO = 0.6;
 const MIN_RATIO = 0.3;
@@ -38,6 +41,14 @@ function WorkspaceLayout() {
     window.addEventListener('mouseup', handleMouseUp);
   }, []);
 
+  const handleDividerKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    const direction = event.key === 'ArrowLeft' ? -1 : 1;
+    const step = event.shiftKey ? 0.05 : 0.02;
+    setRatio((current) => clamp(current + direction * step, MIN_RATIO, MAX_RATIO));
+  }, []);
+
   return (
     <div className="flex h-screen w-screen flex-col">
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4">
@@ -49,7 +60,11 @@ function WorkspaceLayout() {
           <Logo size={20} />
           <h1 className="text-sm font-semibold text-gray-900">mind-web</h1>
         </Link>
-        <ProjectIOControls />
+        <div className="flex items-center gap-2">
+          <ProjectHistoryControls />
+          <span className="h-5 w-px bg-gray-200" aria-hidden />
+          <ProjectIOControls />
+        </div>
       </header>
 
       <div ref={containerRef} className="flex min-h-0 flex-1">
@@ -62,8 +77,17 @@ function WorkspaceLayout() {
 
         {!isEditorExpanded && (
           <div
+            role="separator"
+            aria-label="캔버스와 편집기 너비 조절"
+            aria-orientation="vertical"
+            aria-valuemin={MIN_RATIO * 100}
+            aria-valuemax={MAX_RATIO * 100}
+            aria-valuenow={Math.round(ratio * 100)}
+            tabIndex={0}
+            title="드래그하거나 좌우 화살표로 너비 조절"
             onMouseDown={handleDividerMouseDown}
-            className="w-1 shrink-0 cursor-col-resize bg-gray-200 transition-colors hover:bg-blue-400"
+            onKeyDown={handleDividerKeyDown}
+            className="w-1 shrink-0 cursor-col-resize bg-gray-200 transition-colors hover:bg-brand-400 focus:bg-brand-500 focus:outline-none"
           />
         )}
 
@@ -75,7 +99,7 @@ function WorkspaceLayout() {
         </div>
       </div>
 
-      <AppFooter variant="compact" />
+      <WorkspaceStatusBar />
     </div>
   );
 }
