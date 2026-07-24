@@ -1,4 +1,4 @@
-import type { PageNodeSummary } from '@entities/node';
+import { findDuplicatePageRoutes, isValidPageRoute, type PageNodeSummary } from '@entities/node';
 import type { RouteEdge } from '@entities/edge';
 import type { PageComponentData } from '@entities/page-component';
 
@@ -22,12 +22,33 @@ export function analyzeStructure({
   edges,
   componentsByNodeId,
 }: StructureAnalysisInput): StructureAnalysisResult {
-  // 페이지가 1개뿐이면 아직 분석할 "구조"가 없다 — 첫 페이지부터 고립 경고를 띄우는 노이즈 방지
-  if (nodes.length <= 1) return { issues: [], usedFallbackRoot: false };
-
   const issues: StructureIssue[] = [];
 
-  // ① 고립 노드 — 어떤 엣지에도 붙어 있지 않은 노드 (self-loop도 "붙어 있음"으로 취급)
+  // ① 라우트 형식·중복 — 페이지 수와 무관하게 즉시 안내한다.
+  const duplicateRoutes = findDuplicatePageRoutes(nodes.map((node) => node.data.route));
+  for (const node of nodes) {
+    if (!isValidPageRoute(node.data.route)) {
+      issues.push({
+        id: `invalid-route:${node.id}`,
+        type: 'invalid-route',
+        nodeId: node.id,
+        message: `"${node.data.name}"의 경로는 /로 시작하고 공백·쿼리·해시를 포함하지 않아야 해요.`,
+      });
+    }
+    if (duplicateRoutes.has(node.data.route)) {
+      issues.push({
+        id: `duplicate-route:${node.id}`,
+        type: 'duplicate-route',
+        nodeId: node.id,
+        message: `"${node.data.route}" 경로가 다른 페이지와 중복되어 있어요.`,
+      });
+    }
+  }
+
+  // 페이지가 1개뿐이면 아직 연결 구조가 없다 — 첫 페이지부터 고립 경고를 띄우지 않는다.
+  if (nodes.length <= 1) return { issues, usedFallbackRoot: false };
+
+  // ② 고립 노드 — 어떤 엣지에도 붙어 있지 않은 노드 (self-loop도 "붙어 있음"으로 취급)
   const connectedNodeIds = new Set<string>();
   for (const edge of edges) {
     connectedNodeIds.add(edge.source);
@@ -45,7 +66,7 @@ export function analyzeStructure({
     });
   }
 
-  // ② 도달 불가 페이지 — 루트에서 방향 그래프(source→target) BFS로 못 닿는 노드.
+  // ③ 도달 불가 페이지 — 루트에서 방향 그래프(source→target) BFS로 못 닿는 노드.
   //    고립 노드는 정의상 여기에도 걸리므로 제외 (노드당 가장 구체적인 이슈 1개).
   const rootByRoute = nodes.find((node) => node.data.route === '/');
   const root = rootByRoute ?? nodes[0];
@@ -75,7 +96,7 @@ export function analyzeStructure({
     });
   }
 
-  // ③ 죽은 라우트 — 엣지는 있지만 source 페이지에 그 target으로 이동하는 컴포넌트가 없음.
+  // ④ 죽은 라우트 — 엣지는 있지만 source 페이지에 그 target으로 이동하는 컴포넌트가 없음.
   //    modal 타입도 클릭 수단으로 인정 (프리뷰에서 모달 내 "이동" 버튼이 실제 동작).
   const nodeDataById = new Map(nodes.map((node) => [node.id, node.data]));
   for (const edge of edges) {

@@ -1,4 +1,9 @@
-export type StructureIssueType = 'isolated-node' | 'unreachable-page' | 'dead-route';
+export type StructureIssueType =
+  | 'invalid-route'
+  | 'duplicate-route'
+  | 'isolated-node'
+  | 'unreachable-page'
+  | 'dead-route';
 
 export interface StructureIssue {
   // React key 겸 안정 식별자 — `${type}:${nodeId | edgeId}`

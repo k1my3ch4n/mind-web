@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 import { useNodeStore } from '@entities/node';
 import { useCanvasSelectionStore } from '@shared/model/selectionStore';
@@ -8,6 +9,8 @@ import { useStructureIssues } from '../model/useStructureIssues';
 import type { StructureIssue, StructureIssueType } from '../model/types';
 
 const ISSUE_TYPE_LABEL: Record<StructureIssueType, string> = {
+  'invalid-route': '경로 형식',
+  'duplicate-route': '경로 중복',
   'isolated-node': '고립',
   'unreachable-page': '도달 불가',
   'dead-route': '죽은 라우트',
@@ -38,13 +41,18 @@ function StructureInsightPanel() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors ${
+        className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors ${
           hasIssues
             ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
             : 'border-gray-200 bg-white text-gray-400 hover:bg-gray-50'
         }`}
       >
-        {hasIssues ? `⚠ 구조 이슈 ${issues.length}` : '✓ 구조 OK'}
+        {hasIssues ? (
+          <AlertTriangle size={13} aria-hidden />
+        ) : (
+          <CheckCircle2 size={13} aria-hidden />
+        )}
+        {hasIssues ? `구조 이슈 ${issues.length}` : '구조 OK'}
       </button>
 
       {isOpen && (
@@ -74,7 +82,7 @@ function StructureInsightPanel() {
               </ul>
             </>
           ) : (
-            <p className="px-3 py-3 text-center text-xs text-gray-300">
+            <p className="px-3 py-3 text-center text-xs text-gray-500">
               발견된 구조 이슈가 없어요.
             </p>
           )}
